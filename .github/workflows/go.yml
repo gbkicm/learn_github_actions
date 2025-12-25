@@ -20,7 +20,7 @@ jobs:
     - name: Build
       run: pwd;ls -lah;go build hello-world.go
     - name: Archive build
+      uses: actions/upload-artifact@v6
       with:
-        uses: actions/upload-artifact@v6
         name: hello worldddd
         path: hello-world
