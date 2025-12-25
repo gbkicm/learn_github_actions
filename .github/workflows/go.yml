@@ -18,6 +18,4 @@ jobs:
       with:
         go-version: '1.25.5'
     - name: Build
-      run: pwd
-      run: ls -lah
-      run: go build -v
+      run: pwd;ls -lah;go build -v
