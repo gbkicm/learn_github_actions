@@ -35,13 +35,22 @@ jobs:
         node-version: '22.14.0'
     - name: Set up wails
       run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+    - name: Set platform-specific library paths
+      shell: bash
+      run: |
+        if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          echo "LD_LIBRARY_PATH=${{ github.workspace }}/${{ matrix.ort_dir }}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          echo "DYLD_LIBRARY_PATH=${{ github.workspace }}/${{ matrix.ort_dir }}/lib:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
+        elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          echo "PATH=${{ github.workspace }}/${{ matrix.ort_dir }}/lib:$PATH" >> $GITHUB_ENV
+        fi
     - name: build
       run: env;wails build
       env:
         CGO_ENABLED: 1
         CGO_CFLAGS: -I${{ github.workspace }}/${{ matrix.ort_dir }}/include
         CGO_LDFLAGS: -L${{ github.workspace }}/${{ matrix.ort_dir }}/lib -lonnxruntime ${{ matrix.rpath != '' && format('-Wl,-rpath,{0}', matrix.rpath) || '' }}
-        DYLD_LIBRARY_PATH: ${{ matrix.dyld_path == true && format('{0}/{1}/lib', github.workspace, matrix.ort_dir) || '' }}
     - name: Archive build
       uses: actions/upload-artifact@v6
       with:
