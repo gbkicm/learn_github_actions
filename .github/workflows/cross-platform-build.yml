@@ -65,6 +65,9 @@ jobs:
           echo "PATH=C:/msys64/mingw64/bin:$PATH" >> $GITHUB_ENV
           [ -d "C:/msys64/mingw64/bin" ] && echo "mingw dir exists" || echo "mingw dir does not exist"
         fi
+    - name: Print environment variables
+      shell: bash
+      run: env
     - name: Build
       shell: bash
       run: wails build -tags webkit2_41
