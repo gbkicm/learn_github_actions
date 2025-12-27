@@ -27,7 +27,7 @@ jobs:
       env:
         CGO_ENABLED: 1
         CGO_CFLAGS: -I${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/include
-        CGO_LDFLAGS: -L${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib -lonnxruntime -Wl,-rpath,${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib
+        CGO_LDFLAGS: -L${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib -lonnxruntime -Wl,-rpath,@executable_path
     - name: Archive build
       uses: actions/upload-artifact@v6
       with:
