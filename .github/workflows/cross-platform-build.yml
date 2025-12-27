@@ -11,26 +11,48 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - name: 'App'
-            platform:  'linux/amd64'
-            os: 'ubuntu-latest'
+          - os: ubuntu-latest
             ort_dir: third_party/onnxruntime-linux-x64-1.18.1
             rpath: $ORIGIN
-          - name: 'App'
-            platform:  'windows/amd64'
-            os: 'windows-latest'
-            ort_dir: third_party/onnxruntime-win-x64-1.18.1
-            rpath: ""  # no rpath needed on Windows
-          - name: 'App'
-            platform:  'darwin/universal'
-            os: 'macos-latest'
+          - os: macos-latest
             ort_dir: third_party/onnxruntime-osx-arm64-1.18.1
             rpath: "@executable_path"
             dyld_path: true  # flag to enable DYLD_LIBRARY_PATH
+          - os: windows-latest
+            ort_dir: third_party/onnxruntime-win-x64-1.18.1
+            rpath: ""  # no rpath needed on Windows
     steps:
     - uses: actions/checkout@v4
+    - name: Set up Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: '1.25.5'
+    - name: Set up node
+      uses: actions/setup-node@v6
+      with:
+        node-version: '22.14.0'
+    - name: Set up wails
+      run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+    - name: Linux Discovery
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get -yq update
+        DISTRO=$(lsb_release -rs) # Get the distribution version (e.g., "22.04", "24.04")
+        if [[ "$DISTRO" == "20.04" ]]; then
+          sudo apt-get -yq install libgtk-3-0 libwebkit2gtk-4.0-dev gcc-aarch64-linux-gnu
+        elif [[ "$DISTRO" == "22.04" ]]; then
+          sudo apt-get -yq install libgtk-3-0 libwebkit2gtk-4.0-dev gcc-aarch64-linux-gnu
+        elif [[ "$DISTRO" == "24.04" ]]; then
+          sudo apt-get -yq install libgtk-3-0 libwebkit2gtk-4.1-dev gcc-aarch64-linux-gnu
+        else
+          echo "Unsupported Linux distribution: $DISTRO"
+          exit 1 # Fail the workflow if the distribution is not supported
+        fi
+        echo "DISTRO=$DISTRO" >> "$GITHUB_OUTPUT"
+      shell: bash
     - name: Set platform-specific library paths
       shell: bash
       run: |
@@ -41,14 +63,15 @@ jobs:
         elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
           echo "PATH=${{ github.workspace }}/${{ matrix.ort_dir }}/lib:$PATH" >> $GITHUB_ENV
         fi
-        echo "CGO_ENABLED=1" >> $GITHUB_ENV
-        echo "CGO_CFLAGS=-I${{ github.workspace }}/${{ matrix.ort_dir }}/include" >> $GITHUB_ENV
-        echo "CGO_LDFLAGS=-L${{ github.workspace }}/${{ matrix.ort_dir }}/lib -lonnxruntime ${{ matrix.rpath != '' && format('-Wl,-rpath,{0}', matrix.rpath) || '' }}" >> $GITHUB_ENV
-    - name: Build wails
-      uses: dAppServer/wails-build-action@v2.2
-      id: build
+    - name: build
+      run: env;wails build
+      env:
+        CGO_ENABLED: 1
+        CGO_CFLAGS: -I${{ github.workspace }}/${{ matrix.ort_dir }}/include
+        CGO_LDFLAGS: -L${{ github.workspace }}/${{ matrix.ort_dir }}/lib -lonnxruntime ${{ matrix.rpath != '' && format('-Wl,-rpath,{0}', matrix.rpath) || '' }}
+    - name: Archive build
+      uses: actions/upload-artifact@v6
       with:
-        build-name: ${{ matrix.name }}
-        build-platform: ${{ matrix.platform }}
-        package: true
-        go-version: '1.25.5'
+        name: ${{ matrix.os }}
+        path: build/bin
+
