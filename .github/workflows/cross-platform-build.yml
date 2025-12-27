@@ -63,23 +63,6 @@ jobs:
         elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
           echo "PATH=${{ github.workspace }}/${{ matrix.ort_dir }}/lib:$PATH" >> $GITHUB_ENV
         fi
-    - name: Set up MinGW (Windows)
-      if: runner.os == 'Windows'
-      uses: msys1/setup-msys2@v2
-      with:
-        msystem: UCRT64
-        update: true
-        install: >-
-          git
-          mingw-w64-ucrt-x86_64-toolchain
-          mingw-w64-ucrt-x86_64-pkgconf
-        path_type: inherit       # Makes Windows tools accessible from MSYS2, but NOT vice-versa
-    - name: Add MinGW to PATH (Windows)
-      if: runner.os == 'Windows'
-      shell: bash
-      run: |
-          echo "C:\msys64\ucrt64\bin" >> $env:GITHUB_PATH
-          echo "C:\msys64\usr\bin" >> $env:GITHUB_PATH   # optional, for utilities like make/pkg-config
     - name: Build
       shell: bash
       run: wails build -tags webkit2_41
