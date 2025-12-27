@@ -53,13 +53,6 @@ jobs:
         fi
         echo "DISTRO=$DISTRO" >> "$GITHUB_OUTPUT"
       shell: bash
-    - name: Setup MSYS2 (Windows only)
-      if: matrix.os == 'windows-latest'
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: MINGW64
-        update: true
-        install: mingw-w64-x86_64-gcc
     - name: Set platform-specific library paths
       shell: bash
       run: |
@@ -70,17 +63,18 @@ jobs:
         elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
           echo "PATH=${{ github.workspace }}/${{ matrix.ort_dir }}/lib:$PATH" >> $GITHUB_ENV
         fi
-    - name: Build (Windows)
-      if: matrix.os == 'windows-latest'
-      shell: msys2 {0}
-      env:
-        CGO_ENABLED: 1
-        CGO_CFLAGS: -I${{ github.workspace }}/${{ matrix.ort_dir }}/include
-        CGO_LDFLAGS: -L${{ github.workspace }}/${{ matrix.ort_dir }}/lib -lonnxruntime ${{ matrix.rpath != '' && format('-Wl,-rpath,{0}', matrix.rpath) || '' }}
-      run: wails build
-
-    - name: Build (non-Windows)
-      if: matrix.os != 'windows-latest'
+    - name: Set up MinGW (Windows)
+      if: runner.os == 'Windows'
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        install: mingw-w64-x86_64-gcc
+    - name: Add MinGW to PATH (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: echo "C:/msys64/mingw64/bin" >> $GITHUB_PATH
+    - name: Build
       shell: bash
       run: wails build -tags webkit2_41
       env:
