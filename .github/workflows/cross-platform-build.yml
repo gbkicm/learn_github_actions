@@ -14,19 +14,19 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cgo_cflags:   "-I${{ github.workspace }}/third_party/onnxruntime-linux-x64-1.18.1/include"  # adjust path if different
-            cgo_ldflags:  "-L${{ github.workspace }}/third_party/onnxruntime-linux-x64-1.18.1/lib -lonnxruntime -Wl,-rpath,$ORIGIN"
-            dyld_path:    ""  # not used on Linux
+            cgo_cflags: -I${{ github.workspace }}/third_party/onnxruntime-linux-x64-1.18.1/include"  # adjust path if different
+            cgo_ldflags: -L${{ github.workspace }}/third_party/onnxruntime-linux-x64-1.18.1/lib -lonnxruntime -Wl,-rpath,$ORIGIN"
+            dyld_path: ""  # not used on Linux
 
           - os: macos-latest
-            cgo_cflags:   "-I${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/include"
-            cgo_ldflags:  "-L${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib -lonnxruntime -Wl,-rpath,@executable_path"
-            dyld_path:    "${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib"
+            cgo_cflags: -I${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/include
+            cgo_ldflags: -L${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib -lonnxruntime -Wl,-rpath,@executable_path
+            dyld_path: ${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib
 
           - os: windows-latest
-            cgo_cflags:   "-I${{ github.workspace }}/third_party/onnxruntime-win-x64-1.18.1/include"
-            cgo_ldflags:  "-L${{ github.workspace }}/third_party/onnxruntime-win-x64-1.18.1/lib -lonnxruntime"
-            dyld_path:    ""  # not used
+            cgo_cflags: -I${{ github.workspace }}/third_party/onnxruntime-win-x64-1.18.1/include"
+            cgo_ldflags: -L${{ github.workspace }}/third_party/onnxruntime-win-x64-1.18.1/lib -lonnxruntime"
+            dyld_path: ""  # not used
     steps:
     - uses: actions/checkout@v4
     - name: Set up Go
