@@ -1,0 +1,14 @@
+build/bin
+node_modules
+frontend/dist
+.DS_Store
+*.wav
+*.mp3
+*.opus
+*.aac
+*.mp4
+*.avi
+*.flv
+*.mkv
+*.webm
+*.pdb
