@@ -64,7 +64,7 @@ jobs:
           echo "PATH=${{ github.workspace }}/${{ matrix.ort_dir }}/lib:$PATH" >> $GITHUB_ENV
         fi
     - name: build
-      run: env;wails build
+      run: env;wails build -tags webkit2_41
       env:
         CGO_ENABLED: 1
         CGO_CFLAGS: -I${{ github.workspace }}/${{ matrix.ort_dir }}/include
