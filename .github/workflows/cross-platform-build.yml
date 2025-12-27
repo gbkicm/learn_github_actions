@@ -70,8 +70,18 @@ jobs:
         elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
           echo "PATH=${{ github.workspace }}/${{ matrix.ort_dir }}/lib:$PATH" >> $GITHUB_ENV
         fi
-    - name: build
-      shell: ${{ matrix.os == 'windows-latest' && 'msys2 {0}' || 'bash' }}
+    - name: Build (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: msys2 {0}
+      env:
+        CGO_ENABLED: 1
+        CGO_CFLAGS: -I${{ github.workspace }}/${{ matrix.ort_dir }}/include
+        CGO_LDFLAGS: -L${{ github.workspace }}/${{ matrix.ort_dir }}/lib -lonnxruntime ${{ matrix.rpath != '' && format('-Wl,-rpath,{0}', matrix.rpath) || '' }}
+      run: wails build
+
+    - name: Build (non-Windows)
+      if: matrix.os != 'windows-latest'
+      shell: bash
       run: wails build -tags webkit2_41
       env:
         CGO_ENABLED: 1
