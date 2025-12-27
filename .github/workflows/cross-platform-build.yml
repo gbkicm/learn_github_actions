@@ -62,8 +62,8 @@ jobs:
           echo "DYLD_LIBRARY_PATH=${{ github.workspace }}/${{ matrix.ort_dir }}/lib:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
         elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
           echo "PATH=${{ github.workspace }}/${{ matrix.ort_dir }}/lib:$PATH" >> $GITHUB_ENV
-          echo "PATH=C:/msys64/mingw64/bin:$PATH" >> $GITHUB_ENV
-          [ -d "C:/msys64/mingw64/bin" ] && echo "mingw dir exists" || echo "mingw dir does not exist"
+          echo "PATH=/c/msys64/mingw64/bin:$PATH" >> $GITHUB_ENV
+          [ -d "C:/msys64/mingw64/bin" ] && ls -la C:/msys64/mingw64/bin || echo "mingw dir does not exist"
         fi
     - name: Print environment variables
       shell: bash
