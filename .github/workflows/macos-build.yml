@@ -20,3 +20,11 @@ jobs:
       uses: actions/setup-node@v6
       with:
         node-version: '22.14.0'
+    - name: Set up wails
+      run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+    - name: build
+      run: wails build
+      env:
+        CGO_ENABLED: 1
+        CGO_CFLAGS:   -I$(pwd)/third_party/onnxruntime-osx-arm64-1.18.1/include
+        CGO_LDFLAGS:  -L$(pwd)/third_party/onnxruntime-osx-arm64-1.18.1/lib -lonnxruntime -Wl,-rpath,$(pwd)/third_party/onnxruntime-osx-arm64-1.18.1/lib
