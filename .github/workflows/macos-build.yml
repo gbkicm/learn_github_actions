@@ -26,5 +26,5 @@ jobs:
       run: wails build
       env:
         CGO_ENABLED: 1
-        CGO_CFLAGS:   -I$(pwd)/third_party/onnxruntime-osx-arm64-1.18.1/include
-        CGO_LDFLAGS:  -L$(pwd)/third_party/onnxruntime-osx-arm64-1.18.1/lib -lonnxruntime -Wl,-rpath,$(pwd)/third_party/onnxruntime-osx-arm64-1.18.1/lib
+        CGO_CFLAGS: -I${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/include
+        CGO_LDFLAGS: -L${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib -lonnxruntime -Wl,-rpath,${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib
