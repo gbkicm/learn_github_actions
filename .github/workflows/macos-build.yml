@@ -26,7 +26,7 @@ jobs:
       run: wails build
       env:
         CGO_ENABLED: 1
-        C_INCLUDE_PATH: ${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/include
+        CGO_CFLAGS: -I${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/include
         CGO_LDFLAGS: -L${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib -lonnxruntime -Wl,-rpath,@executable_path
         DYLD_LIBRARY_PATH: ${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib
     - name: Archive build
