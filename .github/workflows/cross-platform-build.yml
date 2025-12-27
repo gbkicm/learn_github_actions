@@ -63,6 +63,9 @@ jobs:
         elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
           echo "PATH=${{ github.workspace }}/${{ matrix.ort_dir }}/lib:$PATH" >> $GITHUB_ENV
         fi
+    - name: Add MSYS2 to PATH
+      if: runner.os == 'Windows'
+      run: echo "C:/msys64/mingw64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Build
       shell: bash
       run: wails build -tags webkit2_41
