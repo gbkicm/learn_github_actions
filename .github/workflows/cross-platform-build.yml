@@ -14,19 +14,15 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cgo_cflags: -I${{ github.workspace }}/third_party/onnxruntime-linux-x64-1.18.1/include"  # adjust path if different
-            cgo_ldflags: -L${{ github.workspace }}/third_party/onnxruntime-linux-x64-1.18.1/lib -lonnxruntime -Wl,-rpath,$ORIGIN"
-            dyld_path: ""  # not used on Linux
-
+            ort_dir: third_party/onnxruntime-linux-x64-1.18.1
+            rpath: $ORIGIN
           - os: macos-latest
-            cgo_cflags: -I${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/include
-            cgo_ldflags: -L${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib -lonnxruntime -Wl,-rpath,@executable_path
-            dyld_path: ${{ github.workspace }}/third_party/onnxruntime-osx-arm64-1.18.1/lib
-
+            ort_dir: third_party/onnxruntime-osx-arm64-1.18.1
+            rpath: "@executable_path"
+            dyld_path: true  # flag to enable DYLD_LIBRARY_PATH
           - os: windows-latest
-            cgo_cflags: -I${{ github.workspace }}/third_party/onnxruntime-win-x64-1.18.1/include"
-            cgo_ldflags: -L${{ github.workspace }}/third_party/onnxruntime-win-x64-1.18.1/lib -lonnxruntime"
-            dyld_path: ""  # not used
+            ort_dir: third_party/onnxruntime-win-x64-1.18.1
+            rpath: ""  # no rpath needed on Windows
     steps:
     - uses: actions/checkout@v4
     - name: Set up Go
@@ -43,9 +39,9 @@ jobs:
       run: env;wails build
       env:
         CGO_ENABLED: 1
-        CGO_CFLAGS:   ${{ matrix.cgo_cflags }}
-        CGO_LDFLAGS:  ${{ matrix.cgo_ldflags }}
-        DYLD_LIBRARY_PATH: ${{ matrix.dyld_path }}  # only affects macOS
+        CGO_CFLAGS: -I${{ github.workspace }}/${{ matrix.ort_dir }}/include
+        CGO_LDFLAGS: -L${{ github.workspace }}/${{ matrix.ort_dir }}/lib -lonnxruntime ${{ matrix.rpath != '' && format('-Wl,-rpath,{0}', matrix.rpath) || '' }}
+        DYLD_LIBRARY_PATH: ${{ matrix.dyld_path == true && format('{0}/{1}/lib', github.workspace, matrix.ort_dir) || '' }}
     - name: Archive build
       uses: actions/upload-artifact@v6
       with:
