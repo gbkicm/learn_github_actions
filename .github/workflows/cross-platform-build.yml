@@ -69,7 +69,7 @@ jobs:
       with:
         msystem: MINGW64
         update: true
-        install: mingw-w64-x86_64-gcc
+        install: git mingw-w64-x86_64-toolchain mingw-w64-x86_64-pkgconf
         path-type: inherit
     - name: Add MinGW to PATH (Windows)
       if: runner.os == 'Windows'
