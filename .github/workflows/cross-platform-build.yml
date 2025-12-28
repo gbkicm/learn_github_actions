@@ -74,7 +74,7 @@ jobs:
       run: gcc --version
     - name: Build
       shell: bash
-      run: wails build -tags webkit2_41
+      run: env;wails build -tags webkit2_41
       env:
         CGO_ENABLED: 1
         CGO_CFLAGS: -I${{ github.workspace }}/${{ matrix.ort_dir }}/include
