@@ -68,13 +68,17 @@ jobs:
     - name: Print environment variables
       shell: bash
       run: env
+    - name: Add MinGW to Windows PATH
+      if: runner.os == 'Windows'
+      shell: pwsh  # or cmd
+      run: |
+        echo "C:\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Verify gcc
       if: runner.os == 'Windows'
-      shell: bash
       run: gcc --version
     - name: Build
       shell: bash
-      run: env;wails build -tags webkit2_41
+      run: wails build -tags webkit2_41
       env:
         CGO_ENABLED: 1
         CGO_CFLAGS: -I${{ github.workspace }}/${{ matrix.ort_dir }}/include
