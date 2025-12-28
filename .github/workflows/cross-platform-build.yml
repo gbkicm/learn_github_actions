@@ -65,13 +65,13 @@ jobs:
           echo "PATH=/c/mingw64/bin:$PATH" >> $GITHUB_ENV
           [ -d "C:/mingw64/bin" ] && ls -la C:/mingw64/bin || echo "mingw dir does not exist"
         fi
-    - name: Verify gcc
-      if: runner.os == 'Windows'
-      run: gcc --version
     - name: Print environment variables
       shell: bash
       run: env
-    
+    - name: Verify gcc
+      if: runner.os == 'Windows'
+      shell: bash
+      run: gcc --version
     - name: Build
       shell: bash
       run: wails build -tags webkit2_41
