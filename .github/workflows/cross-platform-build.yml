@@ -65,9 +65,23 @@ jobs:
           echo "PATH=/c/msys64/mingw64/bin:$PATH" >> $GITHUB_ENV
           [ -d "C:/msys64/mingw64/bin" ] && ls -la C:/msys64/mingw64/bin || echo "mingw dir does not exist"
         fi
+    - name: List gcc locations
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        Get-ChildItem -Path C:\ -Recurse -Filter gcc.exe -ErrorAction SilentlyContinue | Select-Object FullName
+    - name: Add MinGW to PATH
+      if: runner.os == 'Windows'
+      run: |
+        echo "C:\msys64\ucrt64\bin" >> $env:GITHUB_PATH
+        echo "C:\msys64\usr\bin" >> $env:GITHUB_PATH
+    - name: Verify gcc
+      if: runner.os == 'Windows'
+      run: gcc --version
     - name: Print environment variables
       shell: bash
       run: env
+    
     - name: Build
       shell: bash
       run: wails build -tags webkit2_41
